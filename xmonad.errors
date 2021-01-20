@@ -1,7 +1,7 @@
 
-xmonad.hs:268:1: warning: [-Wtabs]
-    Tab character found here, and in two further locations.
+xmonad.hs:223:1: warning: [-Wtabs]
+    Tab character found here, and in three further locations.
     Please use spaces instead.
     |
-268 |         xmproc0<-spawnPipe "xmobar -x 0 /home/gabriel/.config/xmobar/xmobar.config"
+223 |         isFullscreen--> ( doF W.focusDown <+> doFullFloat )]
     | ^^^^^^^^

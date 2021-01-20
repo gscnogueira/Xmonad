@@ -10,15 +10,14 @@
 import XMonad
 import Data.Monoid
 import System.Exit
+import XMonad.Util.Run
+import XMonad.Hooks.ManageHelpers
+import XMonad.Layout.NoBorders
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.EwmhDesktops
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
-import XMonad.Util.SpawnOnce
-import XMonad.Util.Run
-import XMonad.Layout.Spacing
-
-
 
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
@@ -57,7 +56,7 @@ myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 
 -- Border colors for unfocused and focused windows, respectively.
 --
-myNormalBorderColor  = "#434c5e"
+myNormalBorderColor  = "#434C5E"
 myFocusedBorderColor = "#8fbcbb"
 
 ------------------------------------------------------------------------
@@ -74,14 +73,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- launch gmrun
     , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
 
-    -- launch Brave
-    , ((modm , xK_b     ), spawn "brave")
-
-    -- launch slock
-    , ((modm .|. shiftMask, xK_l     ), spawn "slock")
-
     -- close focused window
-    , ((modm,   xK_q     ), kill)
+    , ((modm , xK_q     ), kill)
 
      -- Rotate through the available layout algorithms
     , ((modm,               xK_space ), sendMessage NextLayout)
@@ -193,7 +186,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = avoidStruts ( gaps $ tiled ||| Mirror tiled ||| Full)
+myLayout = avoidStruts  ( tiled ||| Mirror tiled |||Full )
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -205,9 +198,7 @@ myLayout = avoidStruts ( gaps $ tiled ||| Mirror tiled ||| Full)
      ratio   = 1/2
 
      -- Percent of screen to increment by when resizing panes
-     delta   = 3/100 
-     -- Gaps
-     gaps = spacingRaw False (Border 10 0 10 0) True (Border 0 10 0 10) True
+     delta   = 3/100
 
 ------------------------------------------------------------------------
 -- Window rules:
@@ -228,7 +219,8 @@ myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Gimp"           --> doFloat
     , resource  =? "desktop_window" --> doIgnore
-    , resource  =? "kdesktop"       --> doIgnore ]
+    , resource  =? "kdesktop"       --> doIgnore,
+	isFullscreen--> ( doF W.focusDown <+> doFullFloat )]
 
 ------------------------------------------------------------------------
 -- Event handling
@@ -265,9 +257,9 @@ myStartupHook = return ()
 -- Run xmonad with the settings you specify. No need to modify this.
 --
 main = do 
-	xmproc0<-spawnPipe "xmobar -x 0 /home/gabriel/.config/xmobar/xmobar.config"
-	xmproc1<-spawnPipe "xmobar -x 1 /home/gabriel/.config/xmobar/xmobar.config"
-	xmonad $ docks defaults
+	xmproc<-spawnPipe "xmobar -x 0 /home/gabriel/.config/xmobar/xmobar.config"
+	xmproc2<-spawnPipe "xmobar -x 1 /home/gabriel/.config/xmobar/xmobar.config"
+	xmonad $docks $ewmh defaults
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
@@ -291,14 +283,14 @@ defaults = def {
         mouseBindings      = myMouseBindings,
 
       -- hooks, layouts
-        layoutHook         = myLayout,
+        layoutHook         = smartBorders myLayout,
         manageHook         = myManageHook,
-        handleEventHook    = myEventHook,
+        handleEventHook    = myEventHook <+> fullscreenEventHook,
         logHook            = myLogHook,
         startupHook        = myStartupHook
     }
 
--- | Finally, a docks copy of the default bindings in simple textual tabular format.
+-- | Finally, a copy of the default bindings in simple textual tabular format.
 help :: String
 help = unlines ["The default modifier key is 'alt'. Default keybindings:",
     "",
