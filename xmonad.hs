@@ -15,6 +15,8 @@ import XMonad.Hooks.ManageHelpers
 import XMonad.Layout.NoBorders
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.EwmhDesktops
+import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.WorkspaceHistory
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -186,7 +188,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = avoidStruts  ( tiled ||| Mirror tiled |||Full )
+myLayout =  avoidStruts $ ( tiled ||| Mirror tiled |||noBorders Full )
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -220,7 +222,7 @@ myManageHook = composeAll
     , className =? "Gimp"           --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore,
-	isFullscreen--> ( doF W.focusDown <+> doFullFloat )]
+    isFullscreen--> ( doF W.focusDown <+> doFullFloat )]
 
 ------------------------------------------------------------------------
 -- Event handling
@@ -239,7 +241,7 @@ myEventHook = mempty
 -- Perform an arbitrary action on each internal state change or X event.
 -- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
-myLogHook = return ()
+-- myLogHook = return ()
 
 ------------------------------------------------------------------------
 -- Startup hook
@@ -256,19 +258,12 @@ myStartupHook = return ()
 
 -- Run xmonad with the settings you specify. No need to modify this.
 --
+--
 main = do 
-	xmproc<-spawnPipe "xmobar -x 0 /home/gabriel/.config/xmobar/xmobar.config"
-	xmproc2<-spawnPipe "xmobar -x 1 /home/gabriel/.config/xmobar/xmobar.config"
-	xmonad $docks $ewmh defaults
-
--- A structure containing your configuration settings, overriding
--- fields in the default config. Any you don't override, will
--- use the defaults defined in xmonad/XMonad/Config.hs
---
--- No need to modify this.
---
-defaults = def {
-      -- simple stuff
+    xmproc0<-spawnPipe "xmobar -x 0 /home/gabriel/.config/xmobar/xmobar.config"
+    xmproc1<-spawnPipe "xmobar -x 1 /home/gabriel/.config/xmobar/xmobar.config"
+    xmonad $docks $ewmh  $ def {
+        -- simple stuff
         terminal           = myTerminal,
         focusFollowsMouse  = myFocusFollowsMouse,
         clickJustFocuses   = myClickJustFocuses,
@@ -278,18 +273,37 @@ defaults = def {
         normalBorderColor  = myNormalBorderColor,
         focusedBorderColor = myFocusedBorderColor,
 
-      -- key bindings
+        -- key bindings
         keys               = myKeys,
         mouseBindings      = myMouseBindings,
 
-      -- hooks, layouts
-        layoutHook         = smartBorders myLayout,
-        manageHook         = myManageHook,
+        -- hooks, layouts
+        layoutHook         = lessBorders OnlyScreenFloat $  myLayout,
+        manageHook         = myManageHook <+> manageDocks,
         handleEventHook    = myEventHook <+> fullscreenEventHook,
-        logHook            = myLogHook,
+        logHook            = dynamicLogWithPP $ xmobarPP{
+                              ppOutput = \x -> hPutStrLn xmproc0 x >> hPutStrLn xmproc1 x
+                            , ppCurrent = xmobarColor "#BF616A" "" . wrap "[" "]" -- Current workspace in xmobar
+                            , ppVisible = xmobarColor "#D08770" ""                -- Visible but not current workspace
+                            , ppHidden = xmobarColor "#88C0D0" "" . wrap "*" ""   -- Hidden workspaces in xmobar
+                            , ppHiddenNoWindows = xmobarColor "#4C566A" ""        -- Hidden workspaces (no windows)
+                            , ppTitle = xmobarColor "#B48EAD" "" . shorten 60     -- Title of active window in xmobar
+                            , ppLayout = xmobarColor "#EBCB8B" "" . shorten 60     -- Title of active window in xmobar
+                            , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"  -- Urgent workspace
+                            , ppOrder  = \(ws:l:t:ex) -> [ws,l]++ex++[t]
+                            , ppSep =  "<fc=#666666> <fn=1>|</fn></fc>"          -- Separators in xmobar
+                           },
         startupHook        = myStartupHook
     }
 
+
+
+-- A structure containing your configuration settings, overriding
+-- fields in the default config. Any you don't override, will
+-- use the defaults defined in xmonad/XMonad/Config.hs
+--
+-- No need to modify this.
+--
 -- | Finally, a copy of the default bindings in simple textual tabular format.
 help :: String
 help = unlines ["The default modifier key is 'alt'. Default keybindings:",
