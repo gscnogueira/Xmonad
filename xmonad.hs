@@ -15,6 +15,7 @@ import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.WorkspaceHistory
 import XMonad.Actions.GroupNavigation
 import XMonad.Layout.Named
+import XMonad.Util.NamedScratchpad
 import XMonad.Layout.Spacing
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -58,6 +59,12 @@ myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
 --
 myNormalBorderColor  = "#434C5E"
 myFocusedBorderColor = "#8fbcbb"
+
+------------------------------------------------------------------------
+-- SCRATCHPADS
+scratchpads = [
+    NS "terminal" "st -t scratchpad" (title=?"scratchpad") ( customFloating $ W.RationalRect (3/10) (1/4) (4/10) (2/4)
+                                                           )              ]
 
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -161,12 +168,14 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((modm,                   xK_b ), spawn "brave" ), 
         ((modm,                 xK_f), spawn "firefox"),
         ((modm,                 xK_e), spawn "emacs"),
+        ((modm,                 xK_Print), spawn "flameshot gui"),
         ((modm,                 xK_bracketleft), nextScreen),
         ((modm,                 xK_bracketright), prevScreen),
         ((modm,                 xK_Tab), toggleWS),
         ((modm,                 xK_space), moveTo Next EmptyWS),
         ((modm .|. shiftMask,   xK_bracketleft), shiftToNext),
         ((modm .|. shiftMask,   xK_bracketright), shiftToPrev),
+        ((mod1Mask ,   xK_space), namedScratchpadAction scratchpads "terminal" ),
         ((modm .|. shiftMask,   xK_l), spawn "slock"),
       ((modm,                   xK_c), spawn "~/.local/bin/show_configs")]
 
@@ -291,7 +300,7 @@ main = do
 
         -- hooks, layouts
         layoutHook         = lessBorders OnlyScreenFloat $  myLayout,
-        manageHook         = myManageHook <+> manageDocks,
+        manageHook         = myManageHook <+> manageDocks <+> namedScratchpadManageHook scratchpads,
         handleEventHook    = myEventHook <+> fullscreenEventHook,
         logHook            = dynamicLogWithPP $ xmobarPP{
                               ppOutput = \x -> hPutStrLn xmproc0 x >> hPutStrLn xmproc1 x
