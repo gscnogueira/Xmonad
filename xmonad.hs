@@ -1,15 +1,11 @@
---
--- xmonad example config file.
---
--- A template showing all available configuration hooks,
--- and how to override the defaults in your own xmonad.hs conf file.
---
--- Normally, you'd only override those defaults you care about.
---
+-- Author: Gabriel S. C. Nogueira
+-- email : gab.nog94@gmail.com
+-- github: github.com/nosgueira
 
 import XMonad
 import Data.Monoid
 import System.Exit
+import XMonad.Actions.CycleWS
 import XMonad.Util.Run
 import XMonad.Hooks.ManageHelpers
 import XMonad.Layout.NoBorders
@@ -17,6 +13,8 @@ import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.WorkspaceHistory
+import XMonad.Actions.GroupNavigation
+import XMonad.Layout.Named
 import XMonad.Layout.Spacing
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -79,7 +77,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm , xK_q     ), kill)
 
      -- Rotate through the available layout algorithms
-    , ((modm,               xK_space ), sendMessage NextLayout)
+    , ((modm,               xK_period ), sendMessage NextLayout)
 
     --  Reset the layouts on the current workspace to default
     , ((modm .|. shiftMask, xK_space ), setLayout $ XMonad.layoutHook conf)
@@ -88,7 +86,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm,               xK_n     ), refresh)
 
     -- Move focus to the next window
-    , ((modm,               xK_Tab   ), windows W.focusDown)
+    , ((modm,               xK_space   ), windows W.focusDown)
 
     -- Move focus to the next window
     , ((modm,               xK_j     ), windows W.focusDown)
@@ -118,10 +116,10 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm,               xK_t     ), withFocused $ windows . W.sink)
 
     -- Increment the number of windows in the master area
-    , ((modm              , xK_comma ), sendMessage (IncMasterN 1))
+    , ((modm              , xK_i ), sendMessage (IncMasterN 1))
 
     -- Deincrement the number of windows in the master area
-    , ((modm              , xK_period), sendMessage (IncMasterN (-1)))
+    , ((modm              , xK_d), sendMessage (IncMasterN (-1)))
 
     -- Toggle the status bar gap
     -- Use this binding with avoidStruts from Hooks.ManageDocks.
@@ -157,6 +155,20 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
+    -- My Keybindings
+    ++
+        -- Louch Programs
+    [ ((modm,                   xK_b ), spawn "brave" ), 
+        ((modm,                 xK_f), spawn "firefox"),
+        ((modm,                 xK_e), spawn "emacs"),
+        ((modm,                 xK_bracketleft), nextScreen),
+        ((modm,                 xK_bracketright), prevScreen),
+        ((modm,                 xK_Tab), toggleWS),
+        ((modm,                 xK_space), moveTo Next EmptyWS),
+        ((modm .|. shiftMask,   xK_bracketleft), shiftToNext),
+        ((modm .|. shiftMask,   xK_bracketright), shiftToPrev),
+        ((modm .|. shiftMask,   xK_l), spawn "slock"),
+      ((modm,                   xK_c), spawn "~/.local/bin/show_configs")]
 
 ------------------------------------------------------------------------
 -- Mouse bindings: default actions bound to mouse events
@@ -191,7 +203,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 myLayout =  avoidStruts $ ( tiled ||| Mirror tiled |||noBorders Full )
   where
      -- default tiling algorithm partitions the screen into two panes
-     tiled =  spacingRaw False (Border 10 0 10 0) True (Border 0 10 0 10) True $ Tall nmaster delta ratio
+     tiled =  named "Tiled" $ spacingRaw False (Border 10 0 10 0) True (Border 0 10 0 10) True $ Tall nmaster delta ratio
 
      -- The default number of windows in the master pane
      nmaster = 1
@@ -287,7 +299,7 @@ main = do
                             , ppVisible = xmobarColor "#D08770" ""                -- Visible but not current workspace
                             , ppHidden = xmobarColor "#88C0D0" "" . wrap "*" ""   -- Hidden workspaces in xmobar
                             , ppHiddenNoWindows = xmobarColor "#4C566A" ""        -- Hidden workspaces (no windows)
-                            , ppTitle = xmobarColor "#B48EAD" "" . shorten 60     -- Title of active window in xmobar
+                            , ppTitle = xmobarColor "#B48EAD" "" . shorten 35     -- Title of active window in xmobar
                             , ppLayout = xmobarColor "#EBCB8B" "" . shorten 60     -- Title of active window in xmobar
                             , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"  -- Urgent workspace
                             , ppOrder  = \(ws:l:t:ex) -> [ws,l]++ex++[t]
