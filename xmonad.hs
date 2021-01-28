@@ -52,7 +52,22 @@ myModMask       = mod4Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
-myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
+myWorkspaces    = [" 爵 "," \63592 "," \61728 "," \63616 "," \61485 "," ﭧ "," \63411 "," 拾 "," \61504 "]
+
+
+xmobarEscape :: String -> String
+xmobarEscape = concatMap doubleLts
+    where
+        doubleLts '<' = "<<"
+        doubleLts x   = [x]
+
+myClickableWorkspaces :: [String]
+myClickableWorkspaces = clickable . (map xmobarEscape)
+        $ [" 爵 "," \63592 "," \61728 "," \63616 "," \61485 "," ﭧ "," \63411 "," 拾 "," \61504 "]
+    where 
+clickable l = [ "<action=xdotool key super+" ++ show (n) ++ ">" ++ ws ++ "</action>" |
+                      (i,ws) <- zip [1..9] l,
+                      let n = i ]
 
 -- Border colors for unfocused and focused windows, respectively.
 --
@@ -162,7 +177,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((modm,                   xK_b ), spawn "brave" ), 
         ((modm,                 xK_f), spawn "firefox"),
         ((modm,                 xK_e), spawn "emacs"),
-        ((modm,                 xK_Print), spawn "flameshot gui"),
+        ((0,                 xK_Print), spawn "flameshot gui"),
         ((modm,                 xK_bracketleft), nextScreen),
         ((modm,                 xK_bracketright), prevScreen),
         ((modm,                 xK_Tab), toggleWS),
@@ -283,7 +298,7 @@ main = do
         clickJustFocuses   = myClickJustFocuses,
         borderWidth        = myBorderWidth,
         modMask            = myModMask,
-        workspaces         = myWorkspaces,
+        workspaces         = myClickableWorkspaces,
         normalBorderColor  = myNormalBorderColor,
         focusedBorderColor = myFocusedBorderColor,
 
@@ -299,13 +314,13 @@ main = do
                               ppOutput = \x -> hPutStrLn xmproc0 x >> hPutStrLn xmproc1 x
                             , ppCurrent = xmobarColor "#BF616A" "" . wrap "[" "]" -- Current workspace in xmobar
                             , ppVisible = xmobarColor "#D08770" ""                -- Visible but not current workspace
-                            , ppHidden = xmobarColor "#88C0D0" "" . wrap "*" ""   -- Hidden workspaces in xmobar
+                            , ppHidden = xmobarColor "#88C0D0" ""                 -- Hidden workspaces in xmobar
                             , ppHiddenNoWindows = xmobarColor "#4C566A" ""        -- Hidden workspaces (no windows)
                             , ppTitle = xmobarColor "#B48EAD" "" . shorten 35     -- Title of active window in xmobar
-                            , ppLayout = xmobarColor "#EBCB8B" "" . shorten 60     -- Title of active window in xmobar
+                            , ppLayout = xmobarColor "#EBCB8B" "" . shorten 60    -- Title of active window in xmobar
                             , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"  -- Urgent workspace
                             , ppOrder  = \(ws:l:t:ex) -> [ws,l]++ex++[t]
-                            , ppSep =  "<fc=#666666> <fn=1>|</fn></fc>"          -- Separators in xmobar
+                            , ppSep =  "<fc=#666666> <fn=1>|</fn></fc>"           -- Separators in xmobar
                            },
         startupHook        = myStartupHook
     }
