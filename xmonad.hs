@@ -64,7 +64,7 @@ xmobarEscape = concatMap doubleLts
 
 myClickableWorkspaces :: [String]
 myClickableWorkspaces = clickable . (map xmobarEscape)
-        $ [" 爵 "," \63592 ","\61728 "," \63616 "," \61485 "," ﭧ "," \63411 "," 拾 "," \61504 "]
+        $ ["1","2","3","4","5","6","7","8","9"]
     where 
 clickable l = [ "<action=xdotool key super+" ++ show (n) ++ ">" ++ ws ++ "</action>" |
                       (i,ws) <- zip [1..9] l,
@@ -172,22 +172,25 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- My Keybindings
     ++
         -- Louch Programs
-    [ ((modm,                   xK_b ), spawn "brave" ), 
-        ((modm,                 xK_f), spawn "firefox"),
-        ((modm,                 xK_e), spawn "emacs"),
-        ((0,                 xK_Print), spawn "flameshot gui"),
-        ((modm,                 xK_bracketleft), nextScreen),
-        ((modm,                 xK_bracketright), prevScreen),
-        ((modm,                 xK_Tab), toggleWS),
-        ((modm,                 xK_space), swapNextScreen),
-        ((modm .|. shiftMask,   xK_bracketright), shiftNextScreen),
-        ((modm .|. shiftMask,   xK_bracketleft), shiftPrevScreen),
-        ((modm .|. shiftMask,   xK_l), spawn "slock"),
+    [ ((modm,                       xK_b ), spawn "brave" ), 
+        ((modm,                     xK_f), spawn "firefox"),
+        ((modm,                     xK_e), spawn "emacs"),
+        ((0,                        xK_Print), spawn "flameshot gui"),
+        ((modm,                     xK_bracketleft), nextScreen),
+        ((modm,                     xK_bracketright), prevScreen),
+        ((mod1Mask,                 xK_Tab), nextWS),
+        ((mod1Mask .|. shiftMask,   xK_Tab), prevWS),
+        ((modm,                     xK_Tab), toggleWS),
+        ((modm,                     xK_space), swapNextScreen),
+        ((modm .|. shiftMask,       xK_bracketright), shiftNextScreen),
+        ((modm .|. shiftMask,       xK_bracketleft), shiftPrevScreen),
+        ((modm .|. shiftMask,       xK_l), spawn "slock"),
         ((mod1Mask .|. shiftMask,   xK_q), spawn "poweroff"),
-        ((modm ,   xK_F11), spawn "amixer -D pulse sset Master 1%+"),
-        ((modm ,   xK_F10), spawn "amixer -D pulse sset Master 1%-"),
-        ((modm ,   xK_F9), spawn "amixer -D pulse sset Master toggle"),
-      ((modm,                   xK_c), spawn "~/.local/bin/show_configs")
+        ((modm ,                    xK_F11), spawn "amixer -D pulse sset Master 1%+"),
+        ((modm ,                    xK_F10), spawn "amixer -D pulse sset Master 1%-"),
+        ((modm ,                    xK_F9), spawn "amixer -D pulse sset Master toggle"),
+        ((modm,                     xK_c), spawn "~/.local/bin/show_configs")
+       ,((modm,                     xK_a), spawn "pcmanfm")
     ]
     ++
     [((modm .|. controlMask, k), windows $ swapWithCurrent i)
@@ -323,7 +326,7 @@ main = do
                             , ppHidden = xmobarColor "#88C0D0" ""                 -- Hidden workspaces in xmobar
                             , ppHiddenNoWindows = xmobarColor "#4C566A" ""        -- Hidden workspaces (no windows)
                             , ppTitle = xmobarColor "#B48EAD" "" . shorten 35     -- Title of active window in xmobar
-                            , ppLayout = xmobarColor "#EBCB8B" "" . shorten 60    -- Title of active window in xmobar
+                            , ppLayout = xmobarColor "#EBCB8B" "" . shorten 60    -- Title of active layout in xmobar
                             , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"  -- Urgent workspace
                             , ppOrder  = \(ws:l:t:ex) -> [ws,l]++ex++[t]
                             , ppSep =  "<fc=#666666> <fn=1>|</fn></fc>"           -- Separators in xmobar
