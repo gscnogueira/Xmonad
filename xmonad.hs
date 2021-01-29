@@ -63,7 +63,7 @@ xmobarEscape = concatMap doubleLts
 
 myClickableWorkspaces :: [String]
 myClickableWorkspaces = clickable . (map xmobarEscape)
-        $ [" 爵 "," \63592 "," \61728 "," \63616 "," \61485 "," ﭧ "," \63411 "," 拾 "," \61504 "]
+        $ [" 爵 "," \63592 ","\61728 "," \63616 "," \61485 "," ﭧ "," \63411 "," 拾 "," \61504 "]
     where 
 clickable l = [ "<action=xdotool key super+" ++ show (n) ++ ">" ++ ws ++ "</action>" |
                       (i,ws) <- zip [1..9] l,
@@ -84,7 +84,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- launch dmenu
-    , ((modm,               xK_p     ), spawn "dmenu_run")
+    , ((modm,               xK_p     ), spawn "dmenu_run -hp chromium,firefox,telegram")
 
     -- launch gmrun
     , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
@@ -181,10 +181,14 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         ((modm,                 xK_bracketleft), nextScreen),
         ((modm,                 xK_bracketright), prevScreen),
         ((modm,                 xK_Tab), toggleWS),
-        ((modm,                 xK_space), moveTo Next EmptyWS),
-        ((modm .|. shiftMask,   xK_bracketleft), shiftToNext),
-        ((modm .|. shiftMask,   xK_bracketright), shiftToPrev),
+        ((modm,                 xK_space), swapNextScreen),
+        ((modm .|. shiftMask,   xK_bracketright), shiftNextScreen),
+        ((modm .|. shiftMask,   xK_bracketleft), shiftPrevScreen),
         ((modm .|. shiftMask,   xK_l), spawn "slock"),
+        ((mod1Mask .|. shiftMask,   xK_q), spawn "poweroff"),
+        ((modm ,   xK_F11), spawn "amixer -D pulse sset Master 1%+"),
+        ((modm ,   xK_F10), spawn "amixer -D pulse sset Master 1%-"),
+        ((modm ,   xK_F9), spawn "amixer -D pulse sset Master toggle"),
       ((modm,                   xK_c), spawn "~/.local/bin/show_configs")]
 
 ------------------------------------------------------------------------
