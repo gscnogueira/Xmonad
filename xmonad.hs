@@ -2,23 +2,27 @@
 -- email : gab.nog94@gmail.com
 -- github: github.com/nosgueira
 
-import XMonad
 import Data.Monoid
 import System.Exit
+import XMonad
 import XMonad.Actions.CycleWS
-import XMonad.Util.Run
-import XMonad.Hooks.ManageHelpers
-import XMonad.Layout.NoBorders
-import XMonad.Hooks.ManageDocks
-import XMonad.Hooks.EwmhDesktops
-import XMonad.Hooks.DynamicLog
-import XMonad.Hooks.WorkspaceHistory
 import XMonad.Actions.GroupNavigation
-import XMonad.Layout.Named
-import XMonad.Layout.Spacing
 import XMonad.Actions.SwapWorkspaces
+import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.EwmhDesktops
+import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.ManageHelpers
+import XMonad.Hooks.WorkspaceHistory
+import XMonad.Layout.MultiToggle 
+import XMonad.Layout.MultiToggle.Instances (StdTransformers(NBFULL, MIRROR, NOBORDERS))
+import XMonad.Layout.Named
+import XMonad.Layout.NoBorders
+import XMonad.Layout.Spacing
+import XMonad.Util.Run
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
+import qualified XMonad.Layout.MultiToggle as MT (Toggle(..))
+
 
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
@@ -181,7 +185,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         ((mod1Mask,                 xK_Tab), nextWS),
         ((mod1Mask .|. shiftMask,   xK_Tab), prevWS),
         ((modm,                     xK_Tab), toggleWS),
-        ((modm,                     xK_space), swapNextScreen),
+        ((modm,                     xK_s), swapNextScreen),
         ((modm .|. shiftMask,       xK_bracketright), shiftNextScreen),
         ((modm .|. shiftMask,       xK_bracketleft), shiftPrevScreen),
         ((modm .|. shiftMask,       xK_l), spawn "slock"),
@@ -192,6 +196,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         ((modm,                     xK_c), spawn "~/.local/bin/show_configs")
        ,((modm,                     xK_a), spawn "pcmanfm")
        ,((modm,                     xK_w), spawn "sxiv -t ~/Images/wallpapers/desktop")
+       ,((modm,                     xK_space), sendMessage $ MT.Toggle NBFULL)
     ]
     ++
     [((modm .|. controlMask, k), windows $ swapWithCurrent i)
@@ -227,7 +232,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout =  avoidStruts $ ( tiled ||| Mirror tiled |||noBorders Full )
+myLayout =  avoidStruts $ smartBorders $ mkToggle ( NBFULL ?? NOBORDERS ?? EOT) $  ( tiled ||| Mirror tiled |||noBorders Full )
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled =  named "Tiled" $ spacingRaw False (Border 10 0 10 0) True (Border 0 10 0 10) True $ Tall nmaster delta ratio
