@@ -191,6 +191,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         ((modm ,                    xK_F9), spawn "amixer -D pulse sset Master toggle"),
         ((modm,                     xK_c), spawn "~/.local/bin/show_configs")
        ,((modm,                     xK_a), spawn "pcmanfm")
+       ,((modm,                     xK_w), spawn "sxiv -t ~/Images/wallpapers/desktop")
     ]
     ++
     [((modm .|. controlMask, k), windows $ swapWithCurrent i)
