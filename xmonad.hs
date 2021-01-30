@@ -89,10 +89,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- launch dmenu
-    , ((modm,               xK_p     ), spawn "dmenu_run -hp chromium,firefox,telegram")
-
-    -- launch gmrun
-    , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
+    , ((modm,               xK_p     ), spawn "dmenu_run -p 'dmenu:' -hp chromium,firefox,telegram")
 
     -- close focused window
     , ((modm , xK_q     ), kill)
@@ -265,6 +262,7 @@ myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Gimp"           --> doFloat
     , resource  =? "desktop_window" --> doIgnore
+    , title  =? "Salvar arquivo" --> doRectFloat (W.RationalRect 0.25 0.25 0.5 0.6)
     , resource  =? "kdesktop"       --> doIgnore,
     isFullscreen--> ( doF W.focusDown <+> doFullFloat )]
 
