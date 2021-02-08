@@ -4,21 +4,26 @@
 
 import Data.Monoid
 import System.Exit
+import System.Process
 import XMonad
 import XMonad.Actions.CycleWS
 import XMonad.Actions.GroupNavigation
 import XMonad.Actions.SwapWorkspaces
+import XMonad.Actions.Promote
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
+import XMonad.Actions.CycleWindows
 import XMonad.Hooks.WorkspaceHistory
 import XMonad.Layout.MultiToggle 
 import XMonad.Layout.MultiToggle.Instances (StdTransformers(NBFULL, MIRROR, NOBORDERS))
 import XMonad.Layout.Named
 import XMonad.Layout.NoBorders
+import XMonad.Layout.ResizableTile
 import XMonad.Layout.Spacing
 import XMonad.Util.Run
+import XMonad.Util.SpawnOnce
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
 import qualified XMonad.Layout.MultiToggle as MT (Toggle(..))
@@ -81,6 +86,15 @@ myFocusedBorderColor = "#8fbcbb"
 
 
 ------------------------------------------------------------------------
+--------------------------MY-FUNCTIONS----------------------------------
+------------------------------------------------------------------------
+us="setxkbmap -model abnt -layout us -variant intl -option ctrl:nocaps"
+br="setxkbmap -layout br -option ctrl:nocaps"
+toggleKbd :: String  -> String
+toggleKbd c | br == c = us
+toggleKbd _ = br
+
+------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
 --
 myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
@@ -116,7 +130,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm,               xK_m     ), windows W.focusMaster  )
 
     -- Swap the focused window and the master window
-    , ((modm,               xK_Return), windows W.swapMaster)
+    , ((modm,               xK_Return), promote)
 
     -- Swap the focused window with the next window
     , ((modm .|. shiftMask, xK_j     ), windows W.swapDown  )
@@ -126,9 +140,11 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- Shrink the master area
     , ((modm,               xK_h     ), sendMessage Shrink)
+    , ((mod1Mask,           xK_j     ), sendMessage MirrorShrink)
 
     -- Expand the master area
     , ((modm,               xK_l     ), sendMessage Expand)
+    , ((mod1Mask,           xK_k     ), sendMessage MirrorExpand)
 
     -- Push window back into tiling
     , ((modm,               xK_t     ), withFocused $ windows . W.sink)
@@ -192,7 +208,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         ((modm ,                    xK_F9), spawn "amixer -D pulse sset Master toggle"),
         ((modm,                     xK_c), spawn "~/.local/bin/show_configs")
        ,((modm,                     xK_a), spawn "pcmanfm")
-       ,((modm,                     xK_w), spawn "sxiv -t ~/Images/wallpapers/desktop")
+       ,((modm,                     xK_w), spawn "sxiv -t ~/Images/wallpapers/WallpaperDesktop")
+       ,((modm,                     xK_z), rotFocusedUp)
+       ,((modm .|. shiftMask,       xK_z), rotFocusedDown)
        ,((modm,                     xK_space), sendMessage $ MT.Toggle NBFULL)
     ]
     ++
@@ -229,10 +247,11 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout =  avoidStruts $ smartBorders $ mkToggle ( NBFULL ?? NOBORDERS ?? EOT) $  ( tiled ||| Mirror tiled |||noBorders Full )
+
+myLayout =  avoidStruts $  mkToggle ( NBFULL ?? NOBORDERS ?? EOT) $  ( tiled ||| Mirror tiled |||noBorders Full )
   where
      -- default tiling algorithm partitions the screen into two panes
-     tiled =  named "Tiled" $ spacingRaw False (Border 10 0 10 0) True (Border 0 10 0 10) True $ Tall nmaster delta ratio
+     tiled =  named "Tiled" $ spacingRaw False (Border 10 0 10 0) True (Border 0 10 0 10) True $ ResizableTall nmaster delta ratio []
 
      -- The default number of windows in the master pane
      nmaster = 1
@@ -261,8 +280,10 @@ myLayout =  avoidStruts $ smartBorders $ mkToggle ( NBFULL ?? NOBORDERS ?? EOT) 
 myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Gimp"           --> doFloat
+    , className =? "MEGAsync"           --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , title  =? "Salvar arquivo" --> doRectFloat (W.RationalRect 0.25 0.25 0.5 0.6)
+    , title  =? "Abrir arquivo" --> doRectFloat (W.RationalRect 0.25 0.25 0.5 0.6)
     , resource  =? "kdesktop"       --> doIgnore,
     isFullscreen--> ( doF W.focusDown <+> doFullFloat )]
 
@@ -293,7 +314,8 @@ myEventHook = mempty
 -- per-workspace layout choices.
 --
 -- By default, do nothing.
-myStartupHook = return ()
+myStartupHook = do
+        spawnOnce "trayer --transparent true --alpha 0 --tint 0x2E3440 --edge top --align right --height 23 --width 7 --monitor 1 --expand true &"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
@@ -302,8 +324,8 @@ myStartupHook = return ()
 --
 --
 main = do 
-    xmproc0<-spawnPipe "xmobar -x 0 /home/gabriel/.config/xmobar/xmobar.config"
-    xmproc1<-spawnPipe "xmobar -x 1 /home/gabriel/.config/xmobar/xmobar.config"
+    xmproc0<-spawnPipe "xmobar -x 1 /home/gabriel/.config/xmobar/xmobarNoTrayer.config"
+    xmproc1<-spawnPipe "xmobar -x 0 /home/gabriel/.config/xmobar/xmobar.config"
     xmonad $docks $ewmh  $ def {
         -- simple stuff
         terminal           = myTerminal,
