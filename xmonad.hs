@@ -73,7 +73,7 @@ xmobarEscape = concatMap doubleLts
 
 myClickableWorkspaces :: [String]
 myClickableWorkspaces = clickable . (map xmobarEscape)
-        $ ["1","2","3","4","5","6","7","8","9"]
+        $ ["\61612","\61574","\61729","\62610","\62573","\62744","\61448","\61441","\61723"]
     where 
 clickable l = [ "<action=xdotool key super+" ++ show (n) ++ ">" ++ ws ++ "</action>" |
                       (i,ws) <- zip [1..9] l,
@@ -191,7 +191,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         -- Louch Programs
     [ ((modm,                       xK_b ), spawn "brave" ), 
         ((modm,                     xK_f), spawn "firefox"),
-        ((modm,                     xK_e), spawn "emacs"),
+        ((modm,                     xK_e), spawn "emacsclient -c -n"),
         ((0,                        xK_Print), spawn "flameshot gui"),
         ((modm,                     xK_bracketleft), nextScreen),
         ((modm,                     xK_bracketright), prevScreen),
@@ -214,7 +214,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
        ,((modm,                     xK_space), sendMessage $ MT.Toggle NBFULL)
     ]
     ++
-    [((modm .|. controlMask, k), windows $ swapWithCurrent i)
+    [((mod1Mask .|. shiftMask, k), windows $ swapWithCurrent i)
     | (i, k) <- zip myClickableWorkspaces [xK_1 ..]]
 
 ------------------------------------------------------------------------
@@ -315,7 +315,7 @@ myEventHook = mempty
 --
 -- By default, do nothing.
 myStartupHook = do
-        spawnOnce "trayer --transparent true --alpha 0 --tint 0x2E3440 --edge top --align right --height 23 --width 7 --monitor 1 --expand true &"
+        spawnOnce "trayer --transparent true --alpha 0 --tint 0x2E3440 --edge top --align right --height 23 --width 5 --monitor 1 --expand true &"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
@@ -351,7 +351,7 @@ main = do
                             , ppVisible = xmobarColor "#D08770" ""                -- Visible but not current workspace
                             , ppHidden = xmobarColor "#88C0D0" ""                 -- Hidden workspaces in xmobar
                             , ppHiddenNoWindows = xmobarColor "#4C566A" ""        -- Hidden workspaces (no windows)
-                            , ppTitle = xmobarColor "#B48EAD" "" . shorten 35     -- Title of active window in xmobar
+                            , ppTitle = xmobarColor "#B48EAD" "" . shorten 30     -- Title of active window in xmobar
                             , ppLayout = xmobarColor "#EBCB8B" "" . shorten 60    -- Title of active layout in xmobar
                             , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"  -- Urgent workspace
                             , ppOrder  = \(ws:l:t:ex) -> [ws,l]++ex++[t]
