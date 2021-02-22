@@ -253,7 +253,8 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 myLayout =  avoidStruts $  mkToggle ( NBFULL ?? NOBORDERS ?? EOT) $  ( tiled ||| Mirror tiled |||noBorders Full )
   where
      -- default tiling algorithm partitions the screen into two panes
-     tiled =  named "\61659" $ spacingRaw False (Border 10 0 10 0) True (Border 0 10 0 10) True $ ResizableTall nmaster delta ratio []
+     -- tiled =  named "\61659" $ spacingRaw False (Border 10 0 10 0) True (Border 0 10 0 10) True $ ResizableTall nmaster delta ratio []
+     tiled =  named "\61659" $ ResizableTall nmaster delta ratio []
 
      -- The default number of windows in the master pane
      nmaster = 1
@@ -344,7 +345,7 @@ main = do
         mouseBindings      = myMouseBindings,
 
         -- hooks, layouts
-        layoutHook         = lessBorders OnlyScreenFloat $  myLayout,
+        layoutHook         = smartBorders $ lessBorders OnlyScreenFloat $  myLayout,
         manageHook         = myManageHook <+> manageDocks,
         handleEventHook    = myEventHook <+> fullscreenEventHook,
         logHook            = dynamicLogWithPP $ xmobarPP{
@@ -353,7 +354,7 @@ main = do
                             , ppVisible = xmobarColor "#D08770" ""                -- Visible but not current workspace
                             , ppHidden = xmobarColor "#88C0D0" ""                 -- Hidden workspaces in xmobar
                             , ppHiddenNoWindows = xmobarColor "#4C566A" ""        -- Hidden workspaces (no windows)
-                            , ppTitle = xmobarColor "#B48EAD" "" . shorten 60     -- Title of active window in xmobar
+                            , ppTitle = xmobarColor "#B48EAD" "" . shorten 45     -- Title of active window in xmobar
                             , ppLayout = xmobarColor "#EBCB8B" "" . shorten 60    -- Title of active layout in xmobar
                             , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"  -- Urgent workspace
                             , ppOrder  = \(ws:l:t:ex) -> [ws,l]++ex++[t]
