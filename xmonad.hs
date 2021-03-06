@@ -44,7 +44,7 @@ myClickJustFocuses = False
 
 -- Width of the window border in pixels.
 --
-myBorderWidth   = 3
+myBorderWidth   = 2
 
 -- modMask lets you specify which modkey you want to use. The default
 -- is mod1Mask ("left alt").  You may also consider using mod3Mask
@@ -73,7 +73,7 @@ xmobarEscape = concatMap doubleLts
 
 myClickableWorkspaces :: [String]
 myClickableWorkspaces = clickable . (map xmobarEscape)
-        $ ["\61612","\61574","\61729","\62610","\62573","\62744","\61448","\61441","\61723"]
+        $ ["\62845","\61574","\61729","\62610","\62573","\62744","\61448","\61441","\61723"]
     where 
 clickable l = [ "<action=xdotool key super+" ++ show (n) ++ ">" ++ ws ++ "</action>" |
                       (i,ws) <- zip [1..9] l,
@@ -104,6 +104,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     -- launch dmenu
     , ((modm,               xK_p     ), spawn "dmenu_run -p 'dmenu:' -hp chromium,firefox,telegram")
+
+    , ((mod1Mask,               xK_space     ), spawn "rofi -show drun -show-icons")
 
     -- close focused window
     , ((modm , xK_q     ), kill)
@@ -317,8 +319,9 @@ myEventHook = mempty
 -- per-workspace layout choices.
 --
 -- By default, do nothing.
-myStartupHook = do
-        spawnOnce "trayer --transparent true --alpha 0 --tint 0x2E3440 --edge top --align right --height 23 --width 5 --monitor 1 --expand true &"
+myStartupHook = return()
+-- myStartupHook = do
+        -- spawnOnce "trayer --transparent true --alpha 0 --tint 0x2E3440 --edge top --align right --height 23 --width 5 --monitor 1 --expand true &"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
@@ -328,7 +331,7 @@ myStartupHook = do
 --
 main = do 
     xmproc0<-spawnPipe "xmobar -x 1 /home/gabriel/.config/xmobar/xmobarNoTrayer.config"
-    xmproc1<-spawnPipe "xmobar -x 0 /home/gabriel/.config/xmobar/xmobar.config"
+    xmproc1<-spawnPipe "xmobar -x 0 /home/gabriel/.config/xmobar/xmobarNoTrayer.config"
     xmonad $docks $ewmh  $ def {
         -- simple stuff
         terminal           = myTerminal,
