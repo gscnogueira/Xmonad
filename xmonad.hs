@@ -284,6 +284,7 @@ myLayout =  avoidStruts $  mkToggle ( NBFULL ?? NOBORDERS ?? EOT) $  ( tiled |||
 --
 myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
+    , className =? "GNU Octave"     --> doShift (myClickableWorkspaces !! 3)
     , className =? "Gimp"           --> doFloat
     , className =? "MEGAsync"           --> doFloat
     , resource  =? "desktop_window" --> doIgnore
