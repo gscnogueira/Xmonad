@@ -108,7 +108,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((mod1Mask,               xK_space     ), spawn "rofi -show drun -show-icons")
 
     -- close focused window
-    , ((modm .|. shiftMask , xK_c     ), kill)
+    , ((modm , xK_q     ), kill)
 
      -- Rotate through the available layout algorithms
     , ((modm,               xK_period ), sendMessage NextLayout)
@@ -195,14 +195,14 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         ((modm,                     xK_f), spawn "firefox"),
         ((modm,                     xK_e), spawn "emacsclient -c -n"),
         ((0,                        xK_Print), spawn "flameshot gui"),
-        ((modm,                     xK_w), nextScreen),
-        ((modm,                     xK_q), prevScreen),
+        ((modm,                     xK_bracketleft), nextScreen),
+        ((modm,                     xK_bracketright), prevScreen),
         ((mod1Mask,                 xK_Tab), nextWS),
         ((mod1Mask .|. shiftMask,   xK_Tab), prevWS),
         ((modm,                     xK_Tab), toggleWS),
         ((modm,                     xK_s), swapNextScreen),
-        ((modm .|. shiftMask,       xK_w), shiftNextScreen),
-        ((modm .|. shiftMask,       xK_q), shiftPrevScreen),
+        ((modm .|. shiftMask,       xK_bracketright), shiftNextScreen),
+        ((modm .|. shiftMask,       xK_bracketleft), shiftPrevScreen),
         ((modm .|. shiftMask,       xK_l), spawn "slock"),
         ((mod1Mask .|. shiftMask,   xK_q), spawn "poweroff"),
         ((modm ,                    xK_F11), spawn "amixer -D pulse sset Master 1%+"),
@@ -210,7 +210,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         ((modm ,                    xK_F9), spawn "amixer -D pulse sset Master toggle"),
         ((modm,                     xK_c), spawn "~/.local/bin/show_configs")
        ,((modm,                     xK_a), spawn "pcmanfm")
-       ,((modm .|. shiftMask,       xK_s), spawn "sxiv -t ~/Images/wallpapers/WallpaperDesktop")
+       ,((modm,                     xK_w), spawn "sxiv -t ~/Images/wallpapers/WallpaperDesktop")
        ,((modm,                     xK_z), rotFocusedUp)
        ,((modm .|. shiftMask,       xK_z), rotFocusedDown)
        ,((modm,                     xK_space), sendMessage $ MT.Toggle NBFULL)
