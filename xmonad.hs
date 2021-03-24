@@ -10,6 +10,7 @@ import XMonad.Actions.CycleWS
 import XMonad.Actions.GroupNavigation
 import XMonad.Actions.SwapWorkspaces
 import XMonad.Actions.Promote
+import Data.Maybe (fromJust)
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageDocks
@@ -21,6 +22,7 @@ import XMonad.Layout.MultiToggle.Instances (StdTransformers(NBFULL, MIRROR, NOBO
 import XMonad.Layout.Named
 import XMonad.Layout.NoBorders
 import XMonad.Layout.ResizableTile
+import XMonad.Layout.PerWorkspace
 import XMonad.Layout.Spacing
 import XMonad.Util.Run
 import XMonad.Util.SpawnOnce
@@ -62,26 +64,24 @@ myModMask       = mod4Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
-myWorkspaces    = [" 爵 "," \63592 "," \61728 "," \63616 "," \61485 "," ﭧ "," \63411 "," 拾 "," \61504 "]
 
 
-xmobarEscape :: String -> String
-xmobarEscape = concatMap doubleLts
-    where
-        doubleLts '<' = "<<"
-        doubleLts x   = [x]
+--xmobarEscape :: String -> String
+--xmobarEscape = concatMap doubleLts
+    --where
+        --doubleLts '<' = "<<"
+        --doubleLts x   = [x]
 
-myClickableWorkspaces :: [String]
-myClickableWorkspaces = clickable . (map xmobarEscape)
-        $ ["\62845","\61574","\61729","\62610","\62573","\62744","\61448","\61441","\61723"]
-    where 
-clickable l = [ "<action=xdotool key super+" ++ show (n) ++ ">" ++ ws ++ "</action>" |
-                      (i,ws) <- zip [1..9] l,
-                      let n = i ]
+myWorkspaces =  ["\62845","\61574","\61729","\62610","\62573","\62744","\61448","\61441","\61723"]
+myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] --(,) == \x y -> (x,y)
+
+clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
+    where i = fromJust $ M.lookup ws myWorkspaceIndices
+
 
 -- Border colors for unfocused and focused windows, respectively.
 --
-myNormalBorderColor  = "#434C5E"
+myNormalBorderColor = "#434C5E"
 myFocusedBorderColor = "#8fbcbb"
 
 
@@ -219,7 +219,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     ]
     ++
     [((mod1Mask .|. shiftMask, k), windows $ swapWithCurrent i)
-    | (i, k) <- zip myClickableWorkspaces [xK_1 ..]]
+    | (i, k) <- zip myWorkspaces [xK_1 ..]]
 
 ------------------------------------------------------------------------
 -- Mouse bindings: default actions bound to mouse events
@@ -252,7 +252,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- which denotes layout choice.
 --
 
-myLayout =  avoidStruts $  mkToggle ( NBFULL ?? NOBORDERS ?? EOT) $  ( tiled ||| Mirror tiled |||noBorders Full )
+myLayout =  avoidStruts $  onWorkspace "\62573" (noBorders Full)  $ mkToggle ( NBFULL ?? NOBORDERS ?? EOT) $  ( tiled ||| Mirror tiled |||noBorders Full ) 
   where
      -- default tiling algorithm partitions the screen into two panes
      -- tiled =  named "\61659" $ spacingRaw False (Border 10 0 10 0) True (Border 0 10 0 10) True $ ResizableTall nmaster delta ratio []
@@ -284,7 +284,7 @@ myLayout =  avoidStruts $  mkToggle ( NBFULL ?? NOBORDERS ?? EOT) $  ( tiled |||
 --
 myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
-    , className =? "GNU Octave"     --> doShift (myClickableWorkspaces !! 3)
+    , className =? "GNU Octave"     --> doShift (myWorkspaces !! 3)
     , className =? "Gimp"           --> doFloat
     , className =? "MEGAsync"           --> doFloat
     , resource  =? "desktop_window" --> doIgnore
@@ -340,7 +340,7 @@ main = do
         clickJustFocuses   = myClickJustFocuses,
         borderWidth        = myBorderWidth,
         modMask            = myModMask,
-        workspaces         = myClickableWorkspaces,
+        workspaces         = myWorkspaces,
         normalBorderColor  = myNormalBorderColor,
         focusedBorderColor = myFocusedBorderColor,
 
@@ -355,10 +355,10 @@ main = do
         logHook            = dynamicLogWithPP $ xmobarPP{
                               ppOutput = \x -> hPutStrLn xmproc0 x >> hPutStrLn xmproc1 x
                             , ppCurrent = xmobarColor "#BF616A" "" . wrap "[" "]" -- Current workspace in xmobar
-                            , ppVisible = xmobarColor "#D08770" ""                -- Visible but not current workspace
-                            , ppHidden = xmobarColor "#88C0D0" ""                 -- Hidden workspaces in xmobar
-                            , ppHiddenNoWindows = xmobarColor "#4C566A" ""        -- Hidden workspaces (no windows)
-                            , ppTitle = xmobarColor "#B48EAD" "" . shorten 45     -- Title of active window in xmobar
+                            , ppVisible = xmobarColor "#D08770" "" . clickable               -- Visible but not current workspace
+                            , ppHidden = xmobarColor "#88C0D0" "" . clickable                -- Hidden workspaces in xmobar
+                            , ppHiddenNoWindows = xmobarColor "#4C566A" "". clickable        -- Hidden workspaces (no windows)
+                            , ppTitle = xmobarColor "#B48EAD" "" . shorten 60     -- Title of active window in xmobar
                             , ppLayout = xmobarColor "#EBCB8B" "" . shorten 60    -- Title of active layout in xmobar
                             , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"  -- Urgent workspace
                             , ppOrder  = \(ws:l:t:ex) -> [ws,l]++ex++[t]
