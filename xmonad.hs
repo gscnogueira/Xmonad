@@ -167,7 +167,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm .|. shiftMask, xK_q     ), io (exitWith ExitSuccess))
 
     -- Restart xmonad
-    , ((mod1Mask              , xK_q     ), spawn "xmonad --recompile; xmonad --restart")
+    , ((mod1Mask, xK_r     ), spawn "xmonad --recompile; xmonad --restart")
     ]
     ++
 
@@ -252,7 +252,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- which denotes layout choice.
 --
 
-myLayout =  avoidStruts $  onWorkspace "\62573" (noBorders Full)  $ mkToggle ( NBFULL ?? NOBORDERS ?? EOT) $  ( tiled ||| Mirror tiled |||noBorders Full ) 
+myLayout =  avoidStruts $ mkToggle ( NBFULL ?? NOBORDERS ?? EOT) $  ( tiled ||| Mirror tiled |||noBorders Full ) 
   where
      -- default tiling algorithm partitions the screen into two panes
      -- tiled =  named "\61659" $ spacingRaw False (Border 10 0 10 0) True (Border 0 10 0 10) True $ ResizableTall nmaster delta ratio []
