@@ -46,7 +46,7 @@ myClickJustFocuses = False
 
 -- Width of the window border in pixels.
 --
-myBorderWidth   = 2
+myBorderWidth   = 1
 
 -- modMask lets you specify which modkey you want to use. The default
 -- is mod1Mask ("left alt").  You may also consider using mod3Mask
@@ -72,7 +72,7 @@ myModMask       = mod4Mask
         --doubleLts '<' = "<<"
         --doubleLts x   = [x]
 
-myWorkspaces =  ["\62845","\61574","\61729","\62610","\62573","\62744","\61448","\61441","\61723"]
+myWorkspaces =  ["\62845","\61574","\61729","\62610","\62893","\62744","\61448","\61441","\61723"]
 myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] --(,) == \x y -> (x,y)
 
 clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
@@ -103,7 +103,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- launch dmenu
-    , ((modm,               xK_p     ), spawn "dmenu_run -p 'dmenu:' -hp chromium,firefox,telegram")
+    , ((modm,               xK_p     ), spawn "dmenu_run -h 20 -p 'dmenu:' -hp chromium,firefox,telegram")
+
+    , ((modm .|. shiftMask, xK_p     ), spawn "passmenu -h 20 -p 'Passwords:' -i")
 
     , ((mod1Mask,               xK_space     ), spawn "rofi -show drun -show-icons")
 
@@ -161,7 +163,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- Use this binding with avoidStruts from Hooks.ManageDocks.
     -- See also the statusBar function from Hooks.DynamicLog.
     --
-    -- , ((modm              , xK_b     ), sendMessage ToggleStruts)
+    , ((mod1Mask              , xK_b     ), sendMessage ToggleStruts)
 
     -- Quit xmonad
     , ((modm .|. shiftMask, xK_q     ), io (exitWith ExitSuccess))
@@ -285,6 +287,7 @@ myLayout =  avoidStruts $ mkToggle ( NBFULL ?? NOBORDERS ?? EOT) $  ( tiled ||| 
 myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "GNU Octave"     --> doShift (myWorkspaces !! 3)
+    , className =? "mpv"     --> doShift (myWorkspaces !! 6)
     , className =? "Gimp"           --> doFloat
     , className =? "MEGAsync"           --> doFloat
     , resource  =? "desktop_window" --> doIgnore
@@ -302,7 +305,7 @@ myManageHook = composeAll
 -- return (All True) if the default handler is to be run afterwards. To
 -- combine event hooks use mappend or mconcat from Data.Monoid.
 --
-myEventHook = mempty
+myEventHook = XMonad.Hooks.EwmhDesktops.fullscreenEventHook
 
 ------------------------------------------------------------------------
 -- Status bars and logging
@@ -333,7 +336,7 @@ myStartupHook = return()
 main = do 
     xmproc0<-spawnPipe "xmobar -x 1 /home/gabriel/.config/xmobar/xmobarNoTrayer.config"
     xmproc1<-spawnPipe "xmobar -x 0 /home/gabriel/.config/xmobar/xmobarNoTrayer.config"
-    xmonad $docks $ewmh  $ def {
+    xmonad $docks $ewmh  def {
         -- simple stuff
         terminal           = myTerminal,
         focusFollowsMouse  = myFocusFollowsMouse,
