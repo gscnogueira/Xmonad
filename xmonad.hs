@@ -193,8 +193,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- My Keybindings
     ++
         -- Louch Programs
-    [ ((modm,                       xK_b ), spawn "brave" ), 
-        ((modm,                     xK_f), spawn "firefox"),
+    [ ((modm,                       xK_b ), spawn "eval $(get_browser)" ), 
         ((modm,                     xK_e), spawn "emacsclient -c -n"),
         ((0,                        xK_Print), spawn "flameshot gui"),
         ((modm,                     xK_bracketleft), nextScreen),
@@ -211,7 +210,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         ((modm ,                    xK_F10), spawn "amixer -D pulse sset Master 1%-"),
         ((modm ,                    xK_F9), spawn "amixer -D pulse sset Master toggle"),
         ((modm,                     xK_c), spawn "~/.local/bin/show_configs")
-       ,((modm,                     xK_a), spawn "pcmanfm")
+       ,((modm,                     xK_f), spawn "pcmanfm")
        ,((modm,                     xK_w), spawn "sxiv -t ~/Images/wallpapers/WallpaperDesktop")
        ,((modm,                     xK_z), rotFocusedUp)
        ,((modm .|. shiftMask,       xK_z), rotFocusedDown)
