@@ -103,7 +103,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- launch dmenu
-    , ((modm,               xK_p     ), spawn "dmenu_run -h 20 -p 'dmenu:' -hp chromium,firefox,telegram")
+    , ((modm,               xK_p     ), spawn "dmenu_run -p 'dmenu:'")
 
     , ((modm .|. shiftMask, xK_p     ), spawn "passmenu -h 20 -p 'Passwords:' -i")
 
