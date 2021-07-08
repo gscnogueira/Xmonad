@@ -72,7 +72,15 @@ myModMask       = mod4Mask
         --doubleLts '<' = "<<"
         --doubleLts x   = [x]
 
-myWorkspaces =  ["\62845","\61574","\61729","\62610","\62893","\62744","\61448","\61441","\61723"]
+myWorkspaces =  ["\62845",
+                 "\61574",
+                 "\61729",
+                 "\62610",
+                 "\62893",
+                 "\62744",
+                 "\61448",
+                 "\61441",
+                 "\61723"]
 myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..] --(,) == \x y -> (x,y)
 
 clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
@@ -81,8 +89,8 @@ clickable ws = "<action=xdotool key super+"++show i++">"++ws++"</action>"
 
 -- Border colors for unfocused and focused windows, respectively.
 --
-myNormalBorderColor = "#434C5E"
-myFocusedBorderColor = "#8fbcbb"
+myNormalBorderColor = "#282a2e"
+myFocusedBorderColor = "#8abeb7"
 
 
 ------------------------------------------------------------------------
@@ -257,7 +265,7 @@ myLayout =  avoidStruts $ mkToggle ( NBFULL ?? NOBORDERS ?? EOT) $  ( tiled ||| 
   where
      -- default tiling algorithm partitions the screen into two panes
      -- tiled =  named "\61659" $ spacingRaw False (Border 10 0 10 0) True (Border 0 10 0 10) True $ ResizableTall nmaster delta ratio []
-     tiled =  named "\61659" $ ResizableTall nmaster delta ratio []
+     tiled =  named "Tall" $ ResizableTall nmaster delta ratio []
 
      -- The default number of windows in the master pane
      nmaster = 1
@@ -356,15 +364,15 @@ main = do
         handleEventHook    = myEventHook <+> fullscreenEventHook,
         logHook            = dynamicLogWithPP $ xmobarPP{
                               ppOutput = \x -> hPutStrLn xmproc0 x >> hPutStrLn xmproc1 x
-                            , ppCurrent = xmobarColor "#BF616A" "" . wrap "[" "]" -- Current workspace in xmobar
-                            , ppVisible = xmobarColor "#D08770" "" . clickable               -- Visible but not current workspace
+                            , ppCurrent = xmobarColor "#cc6666" "" . wrap "[" "]" -- Current workspace in xmobar
+                            , ppVisible = xmobarColor "#de935f" "" . clickable               -- Visible but not current workspace
                             , ppHidden = xmobarColor "#88C0D0" "" . clickable                -- Hidden workspaces in xmobar
-                            , ppHiddenNoWindows = xmobarColor "#4C566A" "". clickable        -- Hidden workspaces (no windows)
-                            , ppTitle = xmobarColor "#B48EAD" "" . shorten 60     -- Title of active window in xmobar
-                            , ppLayout = xmobarColor "#EBCB8B" "" . shorten 60    -- Title of active layout in xmobar
+                            , ppHiddenNoWindows = xmobarColor "#373b41" "". clickable        -- Hidden workspaces (no windows)
+                            , ppTitle = xmobarColor "#b294bb" "" . shorten 50     -- Title of active window in xmobar
+                            , ppLayout = xmobarColor "#f0c674" "" . shorten 60    -- Title of active layout in xmobar
                             , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"  -- Urgent workspace
                             , ppOrder  = \(ws:l:t:ex) -> [ws,l]++ex++[t]
-                            , ppSep =  "<fc=#666666> <fn=1>|</fn></fc>"           -- Separators in xmobar
+                            , ppSep =  "<fc=#373b41> <fn=1>|</fn></fc>"           -- Separators in xmobar
                            },
         startupHook        = myStartupHook
     }
