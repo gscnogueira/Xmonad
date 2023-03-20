@@ -1,6 +1,11 @@
+-- Author: Gabriel S. C. Nogueira
+-- email : gab.nog94@gmail.com
+-- github: github.com/nosgueira
+
 import XMonad
 
 import XMonad.Actions.CycleWS
+import XMonad.Actions.SwapWorkspaces
 
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.EwmhDesktops
@@ -11,23 +16,33 @@ import XMonad.Hooks.ManageHelpers
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.MultiToggle
 import XMonad.Layout.MultiToggle.Instances
-
-
+import XMonad.Layout.Renamed
+import XMonad.Layout.LayoutCombinators hiding ( (|||) )
 
 import XMonad.Util.EZConfig
 import XMonad.Util.Loggers
-
-
-myXmobarPP :: PP
-myXmobarPP = def {ppCurrent = xmobarColor "black" "white"}
 
 
 main :: IO()
 main = xmonad
        . ewmhFullscreen
        . ewmh
-       . withEasySB (statusBarProp "xmobar" (pure myXmobarPP)) defToggleStrutsKey
+       . withEasySB mySB defToggleStrutsKey
+       . (`additionalKeysP` aKeys) 
+       . (`removeKeysP` rKeys)
        $ myConfig
+
+-------------------------------------------------------------
+----------------------GENEREAL-CONFIG------------------------
+-------------------------------------------------------------
+
+myConfig = def { modMask  = mod4Mask
+                 , terminal = "st"
+                 , layoutHook = myLayout
+                 , manageHook = myManageHook 
+                 , normalBorderColor = "#54595e"
+                 , focusedBorderColor = "#51afef"
+                 }
 
 -------------------------------------------------------------
 ----------------------LAYOUTS--------------------------------
@@ -36,7 +51,7 @@ main = xmonad
 myLayout = mkToggle (single NBFULL)
            $ tiled ||| Mirror tiled ||| Full ||| threeCol
   where
-    threeCol = ThreeColMid nmaster delta ratio
+    threeCol = renamed [Replace "ThreeCol"] $  ThreeColMid nmaster delta ratio
     tiled    = Tall nmaster delta ratio
     nmaster  = 1
     ratio    = 1/2
@@ -52,8 +67,7 @@ myManageHook = composeAll
     , isDialog            --> doFloat
     ]
 
-myWorkspaces =  ["\57351", "\61574", "\61729", "\61564",
-                 "\61465", "\62744", "\61448", "\61441", "\62409"]
+myWorkspaces =  map show [1..9]
 
 -------------------------------------------------------------
 ----------------------KEY-BINDINGS---------------------------
@@ -65,7 +79,7 @@ rKeys = [
     "M-S-c"
   ]
 
-aKeys :: [String] -- Keys do be added to the default configuration
+aKeys :: [(String, X ())] -- Keys do be added to the default configuration
 aKeys = [("M-w"       , spawn "eval $(get_browser)"),
          ("M-e"       , spawn "emacsclient -c -n"),
          ("<Print>"   , spawn "flameshot gui"),
@@ -85,15 +99,35 @@ aKeys = [("M-w"       , spawn "eval $(get_browser)"),
          ("M-<D>"     , spawn "xbacklight -dec 1"),
          ("M-<Space>" , sendMessage $ Toggle NBFULL),
          ("M-r"       , spawn "xmonad --recompile; xmonad --restart"),
-         ("M-q"       , kill)
+         ("M-q"       , kill),
+         ("M-0"       , moveTo Next emptyWS),
+         ("M-m"       , sendMessage $ JumpToLayout "Tall"),
+         ("M-t"       , sendMessage $ JumpToLayout "ThreeCol")
         ]
+        ++
+        [("M-C-"++(show k), windows $ swapWithCurrent i) | (i, k) <- zip myWorkspaces [1 ..]]
 
-myConfig = (`additionalKeysP` aKeys) . 
-           (`removeKeysP` rKeys)
-           $ def { modMask  = mod4Mask
-                 , terminal = "st"
-                 , layoutHook = myLayout
-                 , manageHook = myManageHook 
-                 , normalBorderColor = "#54595e"
-                 , focusedBorderColor = "#51afef"
+-------------------------------------------------------------
+----------------------STATUS-BAR-----------------------------
+-------------------------------------------------------------
+
+myXmobarPP :: PP
+myXmobarPP = def { ppSep =  gray " | " 
+                 , ppCurrent = red . (xmobarBorder "Bottom" "" 2 )
+                 , ppVisible = orange
+                 , ppTitle =  purple . shorten 50 
+                 , ppLayout =  green . shorten 60    -- Title of active layout in xmobar
                  }
+
+  where red    = xmobarColor "#ff6c6b" ""
+        orange = xmobarColor "#ECBE7B" ""
+        cyan   = xmobarColor "#46D9FF" ""
+        gray   = xmobarColor "#54595e" ""
+        purple = xmobarColor "#d499e5" ""
+        green   = xmobarColor "#98be65" ""
+
+
+
+
+
+mySB = (statusBarProp "xmobar" (pure myXmobarPP))
