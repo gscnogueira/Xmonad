@@ -1,33 +1,46 @@
-import XMonad
+#+TITLE: Xmonad Configuration
+#+PROPERTY: header-args:haskell :tangle ~/.xmonad/xmonad.hs
 
-import XMonad.Actions.CycleWS
-import XMonad.Actions.SwapWorkspaces
+* Imports
 
-import XMonad.Hooks.DynamicLog
-import XMonad.Hooks.EwmhDesktops
-import XMonad.Hooks.StatusBar
-import XMonad.Hooks.StatusBar.PP
-import XMonad.Hooks.ManageHelpers
+#+begin_src haskell
+  import XMonad
 
-import XMonad.Layout.ThreeColumns
-import XMonad.Layout.MultiToggle
-import XMonad.Layout.MultiToggle.Instances
-import XMonad.Layout.Renamed
-import XMonad.Layout.LayoutCombinators hiding ( (|||) )
-import XMonad.Layout.NoBorders
+  import XMonad.Actions.CycleWS
+  import XMonad.Actions.SwapWorkspaces
 
-import XMonad.Util.EZConfig
-import XMonad.Util.Loggers
+  import XMonad.Hooks.DynamicLog
+  import XMonad.Hooks.EwmhDesktops
+  import XMonad.Hooks.StatusBar
+  import XMonad.Hooks.StatusBar.PP
+  import XMonad.Hooks.ManageHelpers
 
-main :: IO()
-main = xmonad
-       . withEasySB mySB defToggleStrutsKey
-       . ewmhFullscreen
-       . ewmh
-       . (`additionalKeysP` aKeys) 
-       . (`removeKeysP` rKeys)
-       $ myConfig
+  import XMonad.Layout.ThreeColumns
+  import XMonad.Layout.MultiToggle
+  import XMonad.Layout.MultiToggle.Instances
+  import XMonad.Layout.Renamed
+  import XMonad.Layout.LayoutCombinators hiding ( (|||) )
+  import XMonad.Layout.NoBorders
 
+  import XMonad.Util.EZConfig
+  import XMonad.Util.Loggers
+#+end_src
+
+* Main
+
+#+begin_src haskell
+  main :: IO()
+  main = xmonad
+         . withEasySB mySB defToggleStrutsKey
+         . ewmhFullscreen
+         . ewmh
+         . (`additionalKeysP` aKeys) 
+         . (`removeKeysP` rKeys)
+         $ myConfig
+#+end_src
+
+* General Configuration
+#+begin_src haskell
 myConfig = def { modMask  = mod4Mask
                  , terminal = "st"
                  , layoutHook = myLayout
@@ -35,7 +48,10 @@ myConfig = def { modMask  = mod4Mask
                  , normalBorderColor = "#54595e"
                  , focusedBorderColor = "#51afef"
                  }
+#+end_src
+* Layouts
 
+#+begin_src haskell
 myLayout = smartBorders . mkToggle (single NBFULL)
            $ tiled ||| mtiled ||| Full ||| threeCol
   where
@@ -46,20 +62,35 @@ myLayout = smartBorders . mkToggle (single NBFULL)
     ratio    = 1/2
     delta    = 3/100
     rename s = renamed [Replace s]
+#+end_src
 
-myManageHook :: ManageHook
-myManageHook = composeAll
-    [ className =? "Gimp" --> doFloat
-    , isDialog            --> doFloat
-    ]
+* Window Management
 
-myWorkspaces =  map show [1..9]
+#+begin_src haskell
 
-rKeys :: [String]
-rKeys = ["M-<Space>",
-         "M-q",
-         "M-S-c"
-        ]
+  myManageHook :: ManageHook
+  myManageHook = composeAll
+      [ className =? "Gimp" --> doFloat
+      , isDialog            --> doFloat
+      ]
+
+  myWorkspaces =  map show [1..9]
+
+#+end_src
+
+* Key-Bindings
+** Removed Keys
+Keys do be removed from the default configuration
+#+begin_src haskell
+  rKeys :: [String]
+  rKeys = ["M-<Space>",
+           "M-q",
+           "M-S-c"
+          ]
+#+end_src
+** Added Keys
+Keys do be added to the default configuration
+#+begin_src haskell
 
 aKeys :: [(String, X ())]
 aKeys = [("M-w"       , spawn "eval $(get_browser)"),
@@ -90,10 +121,18 @@ aKeys = [("M-w"       , spawn "eval $(get_browser)"),
         ++
         [("M-C-"++(show k), windows $ swapWithCurrent i) | (i, k) <- zip myWorkspaces [1 ..]]
 
-mySB = (xmobar_1 <> xmobar_2)
-  where xmobar_1 = statusBarProp "xmobar -x 1 ~/.xmonad/xmobar/xmobar_2" (pure myXmobarPP)
-        xmobar_2 = statusBarProp "xmobar -x 0 ~/.xmonad/xmobar/xmobar_1" (pure myXmobarPP)
+#+end_src
+** Status Bar
 
+#+begin_src haskell
+  mySB = (xmobar_1 <> xmobar_2)
+    where xmobar_1 = statusBarProp "xmobar -x 1 ~/.xmonad/xmobar/xmobar_2" (pure myXmobarPP)
+          xmobar_2 = statusBarProp "xmobar -x 0 ~/.xmonad/xmobar/xmobar_1" (pure myXmobarPP)
+#+end_src
+
+*** Formating
+
+#+begin_src haskell
 myXmobarPP :: PP
 myXmobarPP = def { ppSep     =  gray " | " 
                  , ppCurrent = red . (xmobarBorder "Bottom" "" 3 ) 
@@ -109,3 +148,7 @@ myXmobarPP = def { ppSep     =  gray " | "
         gray   = xmobarColor "#54595e" ""
         purple = xmobarColor "#d499e5" ""
         green   = xmobarColor "#98be65" ""
+
+#+end_src
+
+
