@@ -92,7 +92,7 @@ aKeys = [("M-w"       , spawn "eval $(get_browser)"),
          ("M-<F11>"   , spawn "amixer -D pulse sset Master 1%+"),
          ("M-<F10"    , spawn "amixer -D pulse sset Master 1%-"),
          ("M-<F9>"    , spawn "amixer -D pulse sset Master toggle"),
-         ("M-F"       , spawn "pcmanfm"),
+         ("M-f"       , spawn "pcmanfm"),
          ("M-<Tab>"   , toggleWS),
          ("M-]"       , nextScreen),
          ("M-["       , prevScreen),
@@ -102,11 +102,12 @@ aKeys = [("M-w"       , spawn "eval $(get_browser)"),
          ("M-<U>"     , spawn "xbacklight -inc 1"),
          ("M-<D>"     , spawn "xbacklight -dec 1"),
          ("M-<Space>" , sendMessage $ Toggle NBFULL),
-         ("M-r"       , spawn "xmonad --recompile; xmonad --restart"),
+         ("M-r"       , spawn "killall xmobar; xmonad --recompile && xmonad --restart"),
          ("M-q"       , kill),
          ("M-0"       , moveTo Next emptyWS),
-         ("M-m"       , sendMessage $ JumpToLayout "Tall"),
-         ("M-t"       , sendMessage $ JumpToLayout "ThreeCol")
+         ("M-a 1"     , sendMessage $ JumpToLayout "Tall"),
+         ("M-a 2"     , sendMessage $ JumpToLayout "Mirror-Tall"),
+         ("M-a 3"     , sendMessage $ JumpToLayout "Three-Col")
         ]
         ++
         [("M-C-"++(show k), windows $ swapWithCurrent i) | (i, k) <- zip myWorkspaces [1 ..]]
