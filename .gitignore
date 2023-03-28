@@ -1,0 +1,6 @@
+*~ 
+#*#
+/build-x86_64-linux/*.hi
+/build-x86_64-linux/
+/xmonad-x86_64-linux
+/xmonad.errors
