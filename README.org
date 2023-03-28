@@ -93,8 +93,8 @@ Keys do be removed from the default configuration
 #+end_src
 ** Added Keys
 Keys do be added to the default configuration
-#+begin_src haskell
 
+#+begin_src haskell
 aKeys :: [(String, X ())]
 aKeys = [("M-w"       , spawn "eval $(get_browser)"),
          ("M-e"       , spawn "emacsclient -c -n"),
@@ -115,6 +115,7 @@ aKeys = [("M-w"       , spawn "eval $(get_browser)"),
          ("M-<D>"     , spawn "xbacklight -dec 1"),
          ("M-<Space>" , sendMessage $ Toggle NBFULL),
          ("M-r"       , spawn "killall xmobar; xmonad --recompile && xmonad --restart"),
+         ("M-a <Space>", spawn "rofi -show drun -show-icons"),
          ("M-q"       , kill),
          ("M-0"       , moveTo Next emptyWS),
          ("M-a 1"     , sendMessage $ JumpToLayout "Tall"),
