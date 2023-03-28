@@ -18,6 +18,7 @@ import XMonad.Layout.MultiToggle
 import XMonad.Layout.MultiToggle.Instances
 import XMonad.Layout.Renamed
 import XMonad.Layout.LayoutCombinators hiding ( (|||) )
+import XMonad.Layout.NoBorders
 
 import XMonad.Util.EZConfig
 import XMonad.Util.Loggers
@@ -25,9 +26,9 @@ import XMonad.Util.Loggers
 
 main :: IO()
 main = xmonad
+       . withEasySB mySB defToggleStrutsKey
        . ewmhFullscreen
        . ewmh
-       . withEasySB mySB defToggleStrutsKey
        . (`additionalKeysP` aKeys) 
        . (`removeKeysP` rKeys)
        $ myConfig
@@ -48,14 +49,17 @@ myConfig = def { modMask  = mod4Mask
 ----------------------LAYOUTS--------------------------------
 -------------------------------------------------------------
 
-myLayout = mkToggle (single NBFULL)
-           $ tiled ||| Mirror tiled ||| Full ||| threeCol
+myLayout = smartBorders . mkToggle (single NBFULL)
+           $ tiled ||| mtiled ||| Full ||| threeCol
   where
-    threeCol = renamed [Replace "ThreeCol"] $  ThreeColMid nmaster delta ratio
+    threeCol = rename "Three-Col" $  ThreeColMid nmaster delta ratio
     tiled    = Tall nmaster delta ratio
+    mtiled   = rename "Mirror-Tall" $ Mirror tiled 
     nmaster  = 1
     ratio    = 1/2
     delta    = 3/100
+    rename s = renamed [Replace s]
+
 
 -------------------------------------------------------------
 ----------------------WINDOW-MANAGEMENT----------------------
