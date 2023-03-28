@@ -1,5 +1,8 @@
 #+TITLE: Xmonad Configuration
 #+PROPERTY: header-args:haskell :tangle ~/.xmonad/xmonad.hs
+- Author: Gabriel S. C. Nogueira
+- E-mail : [[mailto:gabrielscn@gmail.com][gabrielscn@gmail.com]]
+- GitHub : [[https://github.com/gscnogueira/][gscnogueira]]
 
 * Imports
 
