@@ -1,0 +1,30 @@
+Config { overrideRedirect = False
+       , font = "JetBrains Mono,Font Awesome 6 Free Solid, Font Awesome 6 Brands, Regular, Bold 12"
+       , bgColor  = "#000000"
+       , fgColor  = "#FFFFFF"
+       , alpha  = 255
+       , position = TopSize L 90 26
+       , commands = [ Run Weather "EGPF"
+                        [ "--template", "<weather> <tempC>°C"
+                        , "-L", "0"
+                        , "-H", "25"
+                        , "--low"   , "lightblue"
+                        , "--normal", "#f8f8f2"
+                        , "--high"  , "red"
+                        ] 36000
+                    , Run Cpu
+                        ["-L", "3"
+                        , "-H", "50"
+                        , "--high"  , "red"
+                        , "--normal", "green"
+                        ] 10
+		    , Run Memory         [ "--template" ,"<fc=#51afef></fc> <usedratio>%"] 10
+                    , Run Swap [] 10
+		    , Run Date           "<fc=#ECBE7B></fc> %H:%M<fc=#54595e> | </fc><fc=#46D9FF></fc> %a %b %d" "date" 10
+                    , Run XMonadLog
+                    ]
+       , sepChar  = "%"
+       , alignSep = "}{"
+       --, template = " %XMonadLog%"
+       ,template = " <action=`./.local/src/xmenu/xmenu.sh`><icon=/home/gabriel/.xmonad/xpm/arch.xpm/></action> <fc=#54595e>|</fc> %XMonadLog% }{<fc=#54595e>|</fc> %date% <fc=#54595e>|</fc> %memory% <fc=#54595e>|</fc>"
+       }

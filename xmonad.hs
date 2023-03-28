@@ -116,12 +116,17 @@ aKeys = [("M-w"       , spawn "eval $(get_browser)"),
 ----------------------STATUS-BAR-----------------------------
 -------------------------------------------------------------
 
+clickable :: String -> String  -> String
+clickable cmd txt = "<action=`"++cmd++"`>"++txt++"</action>"
+
+
 myXmobarPP :: PP
-myXmobarPP = def { ppSep =  gray " | " 
-                 , ppCurrent = red . (xmobarBorder "Bottom" "" 2 )
-                 , ppVisible = orange
-                 , ppTitle =  purple . shorten 50 
-                 , ppLayout =  green . shorten 60    -- Title of active layout in xmobar
+myXmobarPP = def { ppSep     =  gray " | " 
+                 , ppCurrent = red . (xmobarBorder "Bottom" "" 3 ) 
+                 , ppVisible = orange 
+                 , ppTitle   = purple . shorten 50 
+                 , ppLayout  = green . shorten 60    -- Title of active layout in xmobar
+                 , ppOrder = \[ws, l, w] -> [ws, l, w]
                  }
 
   where red    = xmobarColor "#ff6c6b" ""
@@ -131,8 +136,9 @@ myXmobarPP = def { ppSep =  gray " | "
         purple = xmobarColor "#d499e5" ""
         green   = xmobarColor "#98be65" ""
 
+mySB = (xmobar_1 <> xmobar_2)
+  where xmobar_1 = statusBarProp "xmobar -x 1 ~/.xmonad/xmobar/xmobar_2" (pure myXmobarPP)
+        xmobar_2 = statusBarProp "xmobar -x 0 ~/.xmonad/xmobar/xmobar_1" (pure myXmobarPP)
 
 
 
-
-mySB = (statusBarProp "xmobar" (pure myXmobarPP))
