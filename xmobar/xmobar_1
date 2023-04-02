@@ -3,7 +3,7 @@ Config { overrideRedirect = False
        , bgColor  = "#000000"
        , fgColor  = "#FFFFFF"
        , alpha  = 255
-       , position = TopSize L 90 26
+       , position = TopSize L 91 26
        , commands = [ Run Weather "EGPF"
                         [ "--template", "<weather> <tempC>°C"
                         , "-L", "0"
