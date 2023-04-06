@@ -2,6 +2,7 @@ import XMonad
 
 import XMonad.Actions.CycleWS
 import XMonad.Actions.SwapWorkspaces
+import XMonad.Actions.Promote
 
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.EwmhDesktops
@@ -58,7 +59,8 @@ myWorkspaces =  map show [1..9]
 rKeys :: [String]
 rKeys = ["M-<Space>",
          "M-q",
-         "M-S-c"
+         "M-S-c",
+         "M-<Return>"
         ]
 
 aKeys :: [(String, X ())]
@@ -88,7 +90,8 @@ aKeys = [("M-w"       , spawn "eval $(get_browser)"),
          ("M-0"       , moveTo Next emptyWS),
          ("M-a 1"     , sendMessage $ JumpToLayout "Tall"),
          ("M-a 2"     , sendMessage $ JumpToLayout "Mirror-Tall"),
-         ("M-a 3"     , sendMessage $ JumpToLayout "Three-Col")
+         ("M-a 3"     , sendMessage $ JumpToLayout "Three-Col"),
+         ("M-<Return>", promote)
         ]
         ++
         [("M-C-"++(show k), windows $ swapWithCurrent i) | (i, k) <- zip myWorkspaces [1 ..]]
