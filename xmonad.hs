@@ -16,6 +16,8 @@ import XMonad.Layout.MultiToggle.Instances
 import XMonad.Layout.Renamed
 import XMonad.Layout.LayoutCombinators hiding ( (|||) )
 import XMonad.Layout.NoBorders
+import XMonad.Layout.Spacing
+
 
 import XMonad.Util.EZConfig
 import XMonad.Util.Loggers
@@ -41,12 +43,14 @@ myLayout = smartBorders . mkToggle (single NBFULL)
            $ tiled ||| mtiled ||| Full ||| threeCol
   where
     threeCol = rename "Three-Col" $  ThreeColMid nmaster delta ratio
-    tiled    = Tall nmaster delta ratio
+    tiled    = rename "Tall" $ gaps $ Tall nmaster delta ratio
     mtiled   = rename "Mirror-Tall" $ Mirror tiled 
     nmaster  = 1
     ratio    = 1/2
     delta    = 3/100
     rename s = renamed [Replace s]
+    gaps = spacingRaw False (Border gap_size 0 gap_size 0) False (Border 0 gap_size 0 gap_size) False
+    gap_size = 5
 
 myManageHook :: ManageHook
 myManageHook = composeAll
@@ -94,6 +98,7 @@ aKeys = [("M-w"         , spawn "eval $(get_browser)"),
          ("M-a 1"       , sendMessage $ JumpToLayout "Tall"),
          ("M-a 2"       , sendMessage $ JumpToLayout "Mirror-Tall"),
          ("M-a 3"       , sendMessage $ JumpToLayout "Three-Col"),
+         ("M-a s"       , sequence_ [toggleScreenSpacingEnabled, toggleWindowSpacingEnabled]),
          ("M-<Return>"  , promote)
         ]
         ++
@@ -107,7 +112,7 @@ myXmobarPP :: PP
 myXmobarPP = def { ppSep     =  gray " | " 
                  , ppCurrent = red . (xmobarBorder "Bottom" "" 3 ) 
                  , ppVisible = orange 
-                 , ppTitle   = purple . shorten 50 
+                 , ppTitle   = purple . shorten 80 
                  , ppLayout  = green . shorten 60    -- Title of active layout in xmobar
                  , ppOrder = \[ws, l, w] -> [ws, l, w]
                  }
@@ -118,3 +123,4 @@ myXmobarPP = def { ppSep     =  gray " | "
         gray   = xmobarColor "#54595e" ""
         purple = xmobarColor "#d499e5" ""
         green   = xmobarColor "#98be65" ""
+        blue   = xmobarColor "#51afef" ""
