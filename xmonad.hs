@@ -67,7 +67,7 @@ myWorkspaces =  map show [1..9]
 
 scratchpads = [
 -- run htop in xterm, find it by title, use default floating window placement
-    NS "terminal" "st" (title =? "st") (customFloating $ W.RationalRect (1/4) (1/4) (1/2) (1/2))]
+    NS "terminal" "st -t 'NSP'" (title =? "NSP") (customFloating $ W.RationalRect (1/4) (1/4) (1/2) (1/2))]
 
 rKeys :: [String]
 rKeys = ["M-<Space>",
