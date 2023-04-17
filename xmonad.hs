@@ -22,6 +22,10 @@ import XMonad.Layout.Spacing
 import XMonad.Util.EZConfig
 import XMonad.Util.Loggers
 
+import XMonad.StackSet as W
+import XMonad.ManageHook
+import XMonad.Util.NamedScratchpad
+
 main :: IO()
 main = xmonad
        . withEasySB mySB defToggleStrutsKey
@@ -34,7 +38,7 @@ main = xmonad
 myConfig = def { modMask  = mod4Mask
                  , terminal = "st"
                  , layoutHook = myLayout
-                 , manageHook = myManageHook 
+                 , manageHook = myManageHook   
                  , normalBorderColor = "#54595e"
                  , focusedBorderColor = "#51afef"
                  }
@@ -55,10 +59,15 @@ myLayout = smartBorders . mkToggle (single NBFULL)
 myManageHook :: ManageHook
 myManageHook = composeAll
     [ className =? "Gimp" --> doFloat
-    , isDialog            --> doFloat
+    , isDialog            --> doFloat,
+    namedScratchpadManageHook scratchpads
     ]
 
 myWorkspaces =  map show [1..9]
+
+scratchpads = [
+-- run htop in xterm, find it by title, use default floating window placement
+    NS "terminal" "st" (title =? "st") (customFloating $ W.RationalRect (1/4) (1/4) (1/2) (1/2))]
 
 rKeys :: [String]
 rKeys = ["M-<Space>",
@@ -77,7 +86,7 @@ aKeys = [("M-w"         , spawn "eval $(get_browser)"),
          ("M-<F10"      , spawn "amixer -D pulse sset Master 1%-"),
          ("M-<F9>"      , spawn "amixer -D pulse sset Master toggle"),
          ("M-f"         , spawn "pcmanfm"),
-         ("M-<Tab>"     , toggleWS),
+         ("M-<Tab>"     , toggleWS' ["NSP"]),
          ("M-]"         , nextScreen),
          ("M-["         , prevScreen),
          ("M-S-]"       , shiftNextScreen),
@@ -85,7 +94,7 @@ aKeys = [("M-w"         , spawn "eval $(get_browser)"),
          ("M-s"         , swapNextScreen),
          ("M-<U>"       , spawn "xbacklight -inc 1"),
          ("M-<D>"       , spawn "xbacklight -dec 1"),
-         ("M-<Space>"   , sendMessage $ Toggle NBFULL),
+         ("M-S-<Space>"   , sendMessage $ Toggle NBFULL),
          ("M-r"         , spawn "killall xmobar; xmonad --recompile && xmonad --restart"),
          ("M-C-d"       , spawn "rofi -show drun -show-icons"),
          ("M-C-s"       , spawn "rofi -show drun -show-icons"),
@@ -99,7 +108,8 @@ aKeys = [("M-w"         , spawn "eval $(get_browser)"),
          ("M-a 2"       , sendMessage $ JumpToLayout "Mirror-Tall"),
          ("M-a 3"       , sendMessage $ JumpToLayout "Three-Col"),
          ("M-a s"       , sequence_ [toggleScreenSpacingEnabled, toggleWindowSpacingEnabled]),
-         ("M-<Return>"  , promote)
+         ("M-<Return>"  , promote),
+         ("M-<Space>"  , namedScratchpadAction scratchpads "terminal" )
         ]
         ++
         [("M-C-"++(show k), windows $ swapWithCurrent i) | (i, k) <- zip myWorkspaces [1 ..]]
@@ -112,6 +122,7 @@ myXmobarPP :: PP
 myXmobarPP = def { ppSep     =  gray " | " 
                  , ppCurrent = red . (xmobarBorder "Bottom" "" 3 ) 
                  , ppVisible = orange 
+                 , ppHidden =  white . isNSP
                  , ppTitle   = purple . shorten 80 
                  , ppLayout  = green . shorten 60    -- Title of active layout in xmobar
                  , ppOrder = \[ws, l, w] -> [ws, l, w]
@@ -121,6 +132,8 @@ myXmobarPP = def { ppSep     =  gray " | "
         orange = xmobarColor "#ECBE7B" ""
         cyan   = xmobarColor "#46D9FF" ""
         gray   = xmobarColor "#54595e" ""
+        white   = xmobarColor "#FFFFFF" ""
         purple = xmobarColor "#d499e5" ""
         green   = xmobarColor "#98be65" ""
         blue   = xmobarColor "#51afef" ""
+        isNSP x = if x == "NSP" then "" else x
