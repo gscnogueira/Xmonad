@@ -1,7 +1,7 @@
 Config { overrideRedirect = False
        , font = "JetBrains Mono,Font Awesome 6 Free Solid, Font Awesome 6 Brands, Regular, Bold 12"
-       , bgColor  = "#000000"
-       , fgColor  = "#FFFFFF"
+       , bgColor  = "#1D1D1D"
+       , fgColor  = "#F6F3E8"
        , alpha  = 255
        , position = TopSize L 91 26
        , commands = [ Run Weather "EGPF"

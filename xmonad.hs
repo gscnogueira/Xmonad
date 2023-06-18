@@ -94,7 +94,7 @@ aKeys = [("M-w"         , spawn "eval $(get_browser)"),
          ("M-s"         , swapNextScreen),
          ("M-<U>"       , spawn "xbacklight -inc 1"),
          ("M-<D>"       , spawn "xbacklight -dec 1"),
-         ("M-S-<Space>"   , sendMessage $ Toggle NBFULL),
+         ("M-<Space>"   , sendMessage $ Toggle NBFULL),
          ("M-r"         , spawn "killall xmobar; xmonad --recompile && xmonad --restart"),
          ("M-C-d"       , spawn "rofi -show drun -show-icons"),
          ("M-C-s"       , spawn "rofi -show drun -show-icons"),
@@ -103,13 +103,14 @@ aKeys = [("M-w"         , spawn "eval $(get_browser)"),
          ("C-S-<Space>" , spawn "dunstctl close-all"),
          ("M-d h"       , spawn "dunstctl history-pop"),
          ("M-q"         , kill),
+         ("M-o"         , spawn "obsidian"),
          ("M-0"         , moveTo Next emptyWS),
          ("M-a 1"       , sendMessage $ JumpToLayout "Tall"),
          ("M-a 2"       , sendMessage $ JumpToLayout "Mirror-Tall"),
          ("M-a 3"       , sendMessage $ JumpToLayout "Three-Col"),
          ("M-a s"       , sequence_ [toggleScreenSpacingEnabled, toggleWindowSpacingEnabled]),
          ("M-<Return>"  , promote),
-         ("M-<Space>"  , namedScratchpadAction scratchpads "terminal" )
+         ("M-S-<Space>"  , namedScratchpadAction scratchpads "terminal" )
         ]
         ++
         [("M-C-"++(show k), windows $ swapWithCurrent i) | (i, k) <- zip myWorkspaces [1 ..]]
@@ -123,17 +124,17 @@ myXmobarPP = def { ppSep     =  gray " | "
                  , ppCurrent = red . (xmobarBorder "Bottom" "" 3 ) 
                  , ppVisible = orange 
                  , ppHidden =  white . isNSP
-                 , ppTitle   = purple . shorten 80 
+                 , ppTitle   = purple . shorten 70 
                  , ppLayout  = green . shorten 60    -- Title of active layout in xmobar
                  , ppOrder = \[ws, l, w] -> [ws, l, w]
                  }
 
-  where red    = xmobarColor "#ff6c6b" ""
-        orange = xmobarColor "#ECBE7B" ""
+  where red    = xmobarColor "#E2434C" ""
+        orange = xmobarColor "#EA9847" ""
         cyan   = xmobarColor "#46D9FF" ""
         gray   = xmobarColor "#54595e" ""
-        white   = xmobarColor "#FFFFFF" ""
-        purple = xmobarColor "#d499e5" ""
-        green   = xmobarColor "#98be65" ""
-        blue   = xmobarColor "#51afef" ""
+        white   = xmobarColor "#F6F3E8" ""
+        purple = xmobarColor "#BF93C3" ""
+        green   = xmobarColor "#86B187" ""
+        blue   = xmobarColor "#8AC6F2" ""
         isNSP x = if x == "NSP" then "" else x
